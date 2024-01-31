@@ -1,49 +1,42 @@
 package fr.cda.cinemacda4.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.cda.cinemacda4.dto.RealisateurDetailDto;
 import fr.cda.cinemacda4.entity.Realisateur;
 import fr.cda.cinemacda4.service.RealisateurService;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/realisateurs")
 public class RealisateurController {
-
     private final RealisateurService realisateurService;
 
-    public RealisateurController(RealisateurService realisateurService) {
+    private final ObjectMapper objectMapper;
+
+    public RealisateurController(RealisateurService realisateurService, ObjectMapper objectMapper) {
         this.realisateurService = realisateurService;
+        this.objectMapper = objectMapper;
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Realisateur> findAll() {
-        return realisateurService.findAll();
+    @GetMapping("/{id}")
+    public RealisateurDetailDto findById(@PathVariable int id) {
+        Realisateur realisateur = realisateurService.findById(id);
+        return objectMapper.convertValue(realisateur, RealisateurDetailDto.class);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable int id) {
+        realisateurService.deleteById(id);
+    }
+
+    @PostMapping
     public Realisateur save(@RequestBody Realisateur realisateur) {
         return realisateurService.save(realisateur);
     }
 
-    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Realisateur findById(@PathVariable Integer id) {
-        return realisateurService.findById(id);
-    }
-
-    @DeleteMapping(path = "/{id}")
-    public void deleteById(@PathVariable Integer id) {
-        realisateurService.deleteById(id);
-    }
-
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping
     public Realisateur update(@RequestBody Realisateur realisateur) {
-        return realisateurService.update(realisateur);
+        return realisateurService.save(realisateur);
     }
 
-    @GetMapping(path = "/search")
-    public Realisateur findByName(@RequestParam String nom) {
-        return realisateurService.findByName(nom);
-    }
 }
