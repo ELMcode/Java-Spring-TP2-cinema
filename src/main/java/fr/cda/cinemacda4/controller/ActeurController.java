@@ -1,8 +1,10 @@
 package fr.cda.cinemacda4.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.cda.cinemacda4.dto.ActeurDetailDto;
+import fr.cda.cinemacda4.dto.ActeurListDto;
 import fr.cda.cinemacda4.entity.Acteur;
 import fr.cda.cinemacda4.service.ActeurService;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,41 +12,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/acteurs")
 public class ActeurController {
-
     private final ActeurService acteurService;
+    private final ObjectMapper objectMapper;
 
 
-    public ActeurController(ActeurService acteurService) {
+    public ActeurController(
+            ActeurService acteurService,
+            ObjectMapper objectMapper
+    ) {
         this.acteurService = acteurService;
+        this.objectMapper = objectMapper;
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Acteur> findAll() {
-        return acteurService.findAll();
+    @PostMapping
+    public Acteur save(@RequestBody Acteur entity) {
+        return acteurService.save(entity);
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Acteur save(@RequestBody Acteur acteur) {
-        return acteurService.save(acteur);
+    @GetMapping("/{id}")
+    public ActeurDetailDto findById(@PathVariable Integer id) {
+        Acteur acteur = acteurService.findById(id);
+        return objectMapper.convertValue(acteur,ActeurDetailDto.class);
     }
 
-    @GetMapping(path ="/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Acteur findById(@PathVariable Integer id) {
-        return acteurService.findById(id);
+    @DeleteMapping("/{id}")
+    public void delete(@RequestBody Acteur acteur) {
+        acteurService.delete(acteur);
     }
 
-    @DeleteMapping(path ="/{id}")
-    public void deleteById(@PathVariable Integer id) {
-        acteurService.deleteById(id);
-    }
-
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Acteur update(@RequestBody Acteur acteur) {
-        return acteurService.update(acteur);
-    }
-
-    @GetMapping(path = "/search")
-    public Acteur findByName(@RequestParam String nom) {
-        return acteurService.findByName(nom);
+    @GetMapping
+    public List<ActeurListDto> findAll() {
+        return acteurService.findAll().stream().map(
+                acteur -> objectMapper.convertValue(acteur, ActeurListDto.class)
+        ).toList();
     }
 }
