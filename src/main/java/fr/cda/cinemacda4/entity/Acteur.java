@@ -20,7 +20,7 @@ import java.util.List;
 )
 public class Acteur {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue
     private Integer id;
 
     private String nom;
@@ -31,5 +31,6 @@ public class Acteur {
             mappedBy = "acteurs",
             cascade = CascadeType.PERSIST
     )
+
     private List<Film> films = new ArrayList<>();
 }

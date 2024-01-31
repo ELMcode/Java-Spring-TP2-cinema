@@ -34,14 +34,14 @@ public class Film {
     @Column(nullable = false)
     private int duree;
 
-    @Column(nullable = false, length = 500)
+    @Column(length = 500)
     private String synopsis;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne // One Realisateur to Many Film
     @JoinColumn(name = "realisateur_id")
     private Realisateur realisateur;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     @JoinTable(
             name = "acteur_film",
             joinColumns = @JoinColumn(name = "film_id"),
