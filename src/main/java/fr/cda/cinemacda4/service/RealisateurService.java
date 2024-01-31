@@ -1,5 +1,6 @@
 package fr.cda.cinemacda4.service;
 
+import fr.cda.cinemacda4.entity.Film;
 import fr.cda.cinemacda4.entity.Realisateur;
 import fr.cda.cinemacda4.repository.RealisateurRepository;
 import org.springframework.http.HttpStatus;
@@ -12,8 +13,14 @@ import java.util.List;
 public class RealisateurService {
     private final RealisateurRepository realisateurRepository;
 
-    public RealisateurService(RealisateurRepository realisateurRepository) {
+    private final FilmService filmService;
+
+    public RealisateurService(
+            RealisateurRepository realisateurRepository,
+            FilmService filmService
+    ) {
         this.realisateurRepository = realisateurRepository;
+        this.filmService = filmService;
     }
 
     public List<Realisateur> findAll() {
@@ -24,30 +31,30 @@ public class RealisateurService {
         return realisateurRepository.save(realisateur);
     }
 
-    public Realisateur findById(Integer id) {
-        return realisateurRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Realisateur " + id + " non trouvé"
-                )
-        );
+    public Realisateur findById(int integer) {
+        return realisateurRepository
+                .findById(integer)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Realisateur not found"
+                        )
+                );
     }
 
     public void deleteById(Integer id) {
-        Realisateur realisateur = this.findById(id);
-        realisateurRepository.delete(realisateur);
-    }
+        this.findById(id);
 
-    public Realisateur update(Realisateur realisateur) {
-        return realisateurRepository.save(realisateur);
-    }
 
-    public Realisateur findByName(String nom) {
-        return realisateurRepository.findByNom(nom).orElseThrow(
-                () -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Realisateur " + nom + " non trouvé"
-                )
+        List<Film> filmsAvecCeRealisateur = filmService.findAllByRealisateurId(id);
+
+        filmsAvecCeRealisateur.forEach(
+                film -> {
+                    film.setRealisateur(null);
+                    filmService.save(film);
+                }
         );
+
+        realisateurRepository.deleteById(id);
     }
 }

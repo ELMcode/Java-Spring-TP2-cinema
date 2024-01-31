@@ -16,38 +16,25 @@ public class ActeurService {
         this.acteurRepository = acteurRepository;
     }
 
-    public List<Acteur> findAll() {
-        return acteurRepository.findAll();
+    public Acteur save(Acteur entity) {
+        return acteurRepository.save(entity);
     }
 
-    public Acteur save(Acteur acteur) {
-        return acteurRepository.save(acteur);
-    }
-
-    public Acteur findById(Integer id) {
-        return acteurRepository.findById(id).orElseThrow(
+    public Acteur findById(Integer integer) {
+        return acteurRepository.findById(integer).orElseThrow(
                 () -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Acteur " + id + " non trouvé"
+                        "Acteur non trouvé"
                 )
         );
     }
 
-    public void deleteById(Integer id) {
-        Acteur acteur = this.findById(id);
+    public void delete(Acteur acteur) {
+        this.findById(acteur.getId());
         acteurRepository.delete(acteur);
     }
 
-    public Acteur update(Acteur acteur) {
-        return acteurRepository.save(acteur);
-    }
-
-    public Acteur findByName(String nom) {
-        return acteurRepository.findByNom(nom).orElseThrow(
-                () -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Acteur " + nom + " non trouvé"
-                )
-        );
+    public List<Acteur> findAll() {
+        return acteurRepository.findAll();
     }
 }
