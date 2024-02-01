@@ -2,13 +2,13 @@ package fr.cda.cinemacda4.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cda.cinemacda4.dto.*;
+import fr.cda.cinemacda4.entity.Acteur;
 import fr.cda.cinemacda4.entity.Film;
 import fr.cda.cinemacda4.entity.Realisateur;
 import fr.cda.cinemacda4.service.FilmService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/films")
@@ -40,7 +40,21 @@ public class FilmController {
     @GetMapping("/{id}") // /films/1
     public FilmCompletDto findById(@PathVariable Integer id) {
         Film film = filmService.findById(id);
-        return objectMapper.convertValue(film, FilmCompletDto.class);
+
+        FilmCompletDto filmCompletDto = new FilmCompletDto();
+        filmCompletDto.setId(film.getId());
+        filmCompletDto.setDuree(film.getDuree());
+        filmCompletDto.setSynopsis(film.getSynopsis());
+        filmCompletDto.setRealisateur(film.getRealisateur());
+        filmCompletDto.setDateSortie(film.getDateSortie());
+        filmCompletDto.setActeurs(
+                film.getActeurs().stream().map(
+                        acteur -> objectMapper.convertValue(acteur, ActeurSansFilmDto.class)
+                ).toList()
+        );
+
+
+        return filmCompletDto;
     }
 
     @DeleteMapping("/{id}")
@@ -59,17 +73,16 @@ public class FilmController {
     }
 
     @GetMapping("/{id}/acteurs")
-    public List<ActeurSansIdDto> getActeursByFilmId(@PathVariable Integer id) {
-        Film film = filmService.findById(id);
-        return film.getActeurs().stream()
-                .map(acteur -> objectMapper.convertValue(acteur, ActeurSansIdDto.class))
-                .collect(Collectors.toList());
+    public List<ActeurSansFilmDto> findActeursByFilm(@PathVariable Integer id) {
+        List<Acteur> acteurs = filmService.findActeursByFilm(id);
+
+        return acteurs.stream().map(
+                acteur -> objectMapper.convertValue(acteur, ActeurSansFilmDto.class)
+        ).toList();
     }
 
-    @GetMapping("/{id}/realisateur")
-    public RealisateurSansFilmsDto getRealisateurByFilmId(@PathVariable Integer id) {
-        Film film = filmService.findById(id);
-        Realisateur realisateur = film.getRealisateur();
-        return objectMapper.convertValue(realisateur, RealisateurSansFilmsDto.class);
+    @GetMapping("/{id}/realisateurs")
+    public Realisateur findRealisateursByFilm(@PathVariable Integer id) {
+        return filmService.findById(id).getRealisateur();
     }
 }

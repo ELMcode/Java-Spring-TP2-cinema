@@ -1,7 +1,7 @@
 package fr.cda.cinemacda4.service;
 
+import fr.cda.cinemacda4.entity.Acteur;
 import fr.cda.cinemacda4.entity.Film;
-import fr.cda.cinemacda4.repository.ActeurRepository;
 import fr.cda.cinemacda4.repository.FilmRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.List;
 public class FilmService {
     private final FilmRepository filmRepository;
 
-    public FilmService(FilmRepository filmRepository, ActeurRepository acteurRepository) {
+    public FilmService(FilmRepository filmRepository) {
         this.filmRepository = filmRepository;
     }
 
@@ -61,5 +61,10 @@ public class FilmService {
                         HttpStatus.NOT_FOUND,
                         "Aucun film ayant ce réalisateur"
                 ));
+    }
+
+    public List<Acteur> findActeursByFilm(Integer id) {
+        Film film = this.findById(id);
+        return film.getActeurs();
     }
 }

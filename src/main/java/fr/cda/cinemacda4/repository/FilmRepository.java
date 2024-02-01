@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface FilmRepository extends JpaRepository<Film, Integer> {
     // SELECT * FROM film WHERE titre like ....
     Optional<Film> findByTitre(String titre);
@@ -17,4 +16,5 @@ public interface FilmRepository extends JpaRepository<Film, Integer> {
 
     // SELECT * FROM film WHERE realisateur_id IS ...
     Optional<List<Film>> findAllByRealisateurId(Integer id);
+
 }

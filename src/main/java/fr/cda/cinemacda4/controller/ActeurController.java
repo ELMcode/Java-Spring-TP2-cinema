@@ -1,8 +1,9 @@
 package fr.cda.cinemacda4.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.cda.cinemacda4.dto.ActeurDetailDto;
-import fr.cda.cinemacda4.dto.ActeurListDto;
+import fr.cda.cinemacda4.dto.ActeurReduitDto;
+import fr.cda.cinemacda4.dto.ActeurSansFilmDto;
+import fr.cda.cinemacda4.dto.FilmSansActeurDto;
 import fr.cda.cinemacda4.entity.Acteur;
 import fr.cda.cinemacda4.service.ActeurService;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequestMapping("/acteurs")
 public class ActeurController {
     private final ActeurService acteurService;
+
     private final ObjectMapper objectMapper;
 
 
@@ -30,9 +32,23 @@ public class ActeurController {
     }
 
     @GetMapping("/{id}")
-    public ActeurDetailDto findById(@PathVariable Integer id) {
+    public ActeurReduitDto findById(@PathVariable Integer id) {
+
         Acteur acteur = acteurService.findById(id);
-        return objectMapper.convertValue(acteur,ActeurDetailDto.class);
+
+        ActeurReduitDto acteurReduitDto = new ActeurReduitDto();
+
+        acteurReduitDto.setId(acteur.getId());
+        acteurReduitDto.setNom(acteur.getNom());
+        acteurReduitDto.setPrenom(acteur.getPrenom());
+
+        acteurReduitDto.setFilms(
+                acteur.getFilms().stream().map(
+                        film -> objectMapper.convertValue(film, FilmSansActeurDto.class)
+                ).toList()
+        );
+
+        return acteurReduitDto;
     }
 
     @DeleteMapping("/{id}")
@@ -41,9 +57,12 @@ public class ActeurController {
     }
 
     @GetMapping
-    public List<ActeurListDto> findAll() {
-        return acteurService.findAll().stream().map(
-                acteur -> objectMapper.convertValue(acteur, ActeurListDto.class)
+    public List<ActeurSansFilmDto> findAll() {
+
+        List<Acteur> acteurs = acteurService.findAll();
+
+        return acteurs.stream().map(
+                acteur -> objectMapper.convertValue(acteur, ActeurSansFilmDto.class)
         ).toList();
     }
 }
