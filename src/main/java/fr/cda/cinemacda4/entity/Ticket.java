@@ -23,4 +23,6 @@ public class Ticket {
     private String nomClient;
 
     private Integer nbPlaces;
+
+    private Boolean isReserved;
 }
